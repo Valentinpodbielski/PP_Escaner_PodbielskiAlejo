@@ -37,7 +37,7 @@ namespace Entidades
             get { return listaDocumentos; }
         }
 
-        public Departamento Locacion
+        public Departamento Locacion // Con el get solo se obtiene el valor sin editarlo
         {
             get { return locacion; }
         }
@@ -67,19 +67,17 @@ namespace Entidades
 
             switch (this.tipo) // Hacemos un switch para elegir el tipo
             {
-                case TipoDoc.libro:
+                case TipoDoc.libro: // En caso de ser libro
                     locacion = Departamento.procesosTecnicos;
                     break;
-                case TipoDoc.mapa:
+                case TipoDoc.mapa: // En caso de ser mapa
                     locacion = Departamento.mapoteca;
                     break;
-                default:
+                default: // valor nulo por defecto
                     locacion = Departamento.nulo;
                     break;
             }
         }
-
-
 
         public static bool operator ==(Escaner e, Documento d) // averigua si el documento esta en el escaner
         {
@@ -111,7 +109,6 @@ namespace Entidades
                         if (doc == (Mapa)d)
                         {
                             retorno = true;
-
                         }
                     }
                 }
@@ -121,7 +118,6 @@ namespace Entidades
                 }
             }
             return retorno;
-
         }
 
         public static bool operator !=(Escaner e, Documento d)
@@ -129,13 +125,12 @@ namespace Entidades
             return !(e == d); // Retorna un false
         }
 
-        
-
         public static bool operator +(Escaner e, Documento d)
         {
-            if (e.tipo == TipoDoc.libro && d is Libro || e.tipo == TipoDoc.mapa && d is Mapa)
+            // verifica que el tipo de documento y el scaner sea del mismo tipo, para no meter un libro en la lista de mapas
+            if (e.tipo == TipoDoc.libro && d is Libro || e.tipo == TipoDoc.mapa && d is Mapa) 
             {
-                if (e != d && d.Estado == Documento.Paso.Inicio)
+                if (e != d && d.Estado == Documento.Paso.Inicio) 
                 {
                     e.CambiarEstadoDocumento(d); // Avanza un estado
                     e.listaDocumentos.Add(d); // Adhiere el documento en la lista
