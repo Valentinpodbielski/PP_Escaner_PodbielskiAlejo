@@ -1,9 +1,7 @@
 
-using System;
+
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,74 +9,45 @@ namespace Entidades
 {
     public class Escaner
     {
-        public enum Departamento
+        //  Campos  //
+        private List<Documento> listaDocumentos;
+        private Departamento locacion;
+        private string marca;
+        private TipoDoc tipo;
+
+
+        // Constructor //
+        public Escaner(string marca, TipoDoc tipo)
         {
-            nulo,
-            mapoteca,
-            procesosTecnicos
+            this.marca = marca;
+            this.tipo = tipo;
+            this.listaDocumentos = new List<Documento>(); // Inicializa la lista de documentos
+
+            // Inicializa la locacion según el tipo de documento a escanear
+            this.locacion = (tipo == TipoDoc.mapa) ? Departamento.mapoteca : Departamento.procesosTecnicos;
         }
 
-        public enum TipoDoc
-        {
-            libro,
-            mapa
-        }
-        Departamento locacion;
-        string marca;
-        TipoDoc tipo;
-        List<Documento> listaDocumentos;
 
-
-
-        // Propiedades  //
-
+        //  Propiedades  //
         public List<Documento> ListaDocumentos
         {
             get { return listaDocumentos; }
         }
-
-        public Departamento Locacion // Con el get solo se obtiene el valor sin editarlo
+        public Departamento Locacion
         {
             get { return locacion; }
         }
-
         public string Marca
         {
             get { return marca; }
         }
-
         public TipoDoc Tipo
         {
             get { return tipo; }
         }
 
-        // Metodos  //
-     
-        public bool CambiarEstadoDocumento(Documento d)
-        {
-            return d.AvanzarEstado();
-        }
 
-        public Escaner(string marca, TipoDoc tipo)
-        {
-            this.marca = marca;
-            this.tipo = tipo;
-            this.listaDocumentos = new List<Documento>(); // Intanciamos una lista
-
-            switch (this.tipo) // Hacemos un switch para elegir el tipo
-            {
-                case TipoDoc.libro: // En caso de ser libro
-                    locacion = Departamento.procesosTecnicos;
-                    break;
-                case TipoDoc.mapa: // En caso de ser mapa
-                    locacion = Departamento.mapoteca;
-                    break;
-                default: // valor nulo por defecto
-                    locacion = Departamento.nulo;
-                    break;
-            }
-        }
-
+        //  Metodos  //
         public static bool operator ==(Escaner e, Documento d) // averigua si el documento esta en el escaner
         {
             bool retorno;
@@ -122,23 +91,46 @@ namespace Entidades
 
         public static bool operator !=(Escaner e, Documento d)
         {
-            return !(e == d); // Retorna un false
+            return !(e == d);
         }
 
         public static bool operator +(Escaner e, Documento d)
         {
-            // verifica que el tipo de documento y el scaner sea del mismo tipo, para no meter un libro en la lista de mapas
-            if (e.tipo == TipoDoc.libro && d is Libro || e.tipo == TipoDoc.mapa && d is Mapa) 
+
+            if (e.Tipo == TipoDoc.libro && d is Libro || e.Tipo == TipoDoc.mapa && d is Mapa)
             {
-                if (e != d && d.Estado == Documento.Paso.Inicio) 
+                if (e != d && d.Estado == Documento.Paso.Inicio)
                 {
-                    e.CambiarEstadoDocumento(d); // Avanza un estado
-                    e.listaDocumentos.Add(d); // Adhiere el documento en la lista
+                    d.AvanzarEstado();
+                    e.listaDocumentos.Add(d);
                     return true;
                 }
             }
             return false;
         }
+
+        public bool CambiarEstadoDocumento(Documento d)
+        {
+            if (listaDocumentos.Contains(d))
+            {
+                return d.AvanzarEstado();
+            }
+            return false;
+        }
+
+
+        //  Propiedades  //
+        public enum Departamento
+        {
+            nulo,
+            mapoteca,
+            procesosTecnicos
+        }
+        public enum TipoDoc
+        {
+            libro,
+            mapa
+        }
+
     }
 }
-
